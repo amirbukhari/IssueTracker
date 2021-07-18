@@ -12,7 +12,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getIssues = exports.createIssue = exports.gitFetch = void 0;
 const node_fetch_1 = require("node-fetch");
 const GITLAB_ROOT_URL = 'https://gitlab.com/api/v4/projects/26602273';
-const PAT = 'e43iLkyiYp4-QsCdZtwW';
+const PAT = `${process.env.PAT}`;
+//  const PAT = 'e43iLkyiYp4-QsCdZtwW';
 //const PROD_PAT = 'zYpMtPXAkBqSPWpWFSBV';
 const gitFetch = (uri, method = 'GET', data = {}) => __awaiter(void 0, void 0, void 0, function* () {
     const useUri = (uri.startsWith(GITLAB_ROOT_URL)

@@ -2,7 +2,8 @@ import { Hash } from '@jamesgmarks/utilities';
 import fetch from 'node-fetch';
 
 const GITLAB_ROOT_URL = 'https://gitlab.com/api/v4/projects/26602273';
- const PAT = 'e43iLkyiYp4-QsCdZtwW';
+const PAT = `${process.env.PAT}`;
+//  const PAT = 'e43iLkyiYp4-QsCdZtwW';
 //const PROD_PAT = 'zYpMtPXAkBqSPWpWFSBV';
 export const gitFetch = async (uri: string, method: 'GET' | 'POST' | 'PUT' = 'GET', data: Hash = {}) => {
   const useUri = (
