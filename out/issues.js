@@ -88,13 +88,13 @@ const getIssueItems = (workspaceRoot) => __awaiter(void 0, void 0, void 0, funct
     return exports.flattenOnce(issueItems);
 });
 const convertTodoItems = (workspaceRoot) => __awaiter(void 0, void 0, void 0, function* () {
-    // const dirItems = getAllFiles(workspaceRoot, []);
-    const dirItems = ['C:/Users/Amir/Documents/Rentsync/billing-system/src/tools/mail/sendgrid.ts'];
+    const dirItems = getAllFiles(workspaceRoot, []);
+    // const dirItems = ['C:/Users/Amir/Documents/Rentsync/billing-system/src/tools/mail/sendgrid.ts'];
     // TODO:
     const files = yield utilities_1.mapAsync(dirItems, (file, i) => __awaiter(void 0, void 0, void 0, function* () {
         var e_1, _a;
         const fileName = file.replace(/\\/g, '/');
-        // issueOutput.appendLine(`file ${fileName}`);
+        issueOutput.appendLine(`file ${fileName}`);
         const rl = readline.createInterface({
             input: fs.createReadStream(fileName),
             crlfDelay: Infinity,

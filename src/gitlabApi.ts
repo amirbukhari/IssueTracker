@@ -1,9 +1,9 @@
 import { Hash } from '@jamesgmarks/utilities';
 import fetch from 'node-fetch';
 
-const GITLAB_ROOT_URL = 'https://gitlab.com/api/v4/projects/23918468';
-// const PAT = 'e43iLkyiYp4-QsCdZtwW';
-const PROD_PAT = 'zYpMtPXAkBqSPWpWFSBV';
+const GITLAB_ROOT_URL = 'https://gitlab.com/api/v4/projects/26602273';
+ const PAT = 'e43iLkyiYp4-QsCdZtwW';
+//const PROD_PAT = 'zYpMtPXAkBqSPWpWFSBV';
 export const gitFetch = async (uri: string, method: 'GET' | 'POST' | 'PUT' = 'GET', data: Hash = {}) => {
   const useUri = (
     uri.startsWith(GITLAB_ROOT_URL)
@@ -17,7 +17,7 @@ export const gitFetch = async (uri: string, method: 'GET' | 'POST' | 'PUT' = 'GE
       headers: {
         // Authorization: `Bearer ${await getSavedAccessToken()}`,
         'Content-Type': 'application/json',
-        'PRIVATE-TOKEN': PROD_PAT,
+        'PRIVATE-TOKEN': PAT,
       },
       ...(
         ['POST', 'PUT'].includes(method)
