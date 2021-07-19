@@ -12,6 +12,7 @@ import * as issues from './issues';
 import { createIssue, getIssues } from './gitlabApi';
 import { convertTodoItems } from './issues';
 
+const issueOutput = window.createOutputChannel('IssueTrac3ke2r');
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: ExtensionContext) {
@@ -26,39 +27,31 @@ export function activate(context: ExtensionContext) {
 	// Now provide the implementation of the command with registerCommand
 	// The commandId parameter must match the command field in package.json
 	const disposable = commands.registerCommand('issuetracker.helloWorld', () => {
-		// The code you place here will be executed every time your command is executed
-
-		// Display a message box to the user
 		window.showInformationMessage('Hello World from issuetracker!');
 	});
 
-	const disposableTwo = commands.registerCommand('issuetracker.clickLink', async () => {
-		// The code you place here will be executed every time your command is executed
+	const disposableTwo = commands.registerCommand('issuetracker.convertTodoItems', async () => {
 		await convertTodoItems(workspace.rootPath || './');
 		// Display a message box to the user
-		window.showInformationMessage('click link from issuetracker!');
+		window.showInformationMessage('converting todo items!');
 	});
 
 	// Create output channel
 	const issueOutput = window.createOutputChannel('IssueTracker');
 
 	const disposableThree = commands.registerCommand('issuetracker.createIssue', async () => {
-		// The code you place here will be executed every time your command is executed
-
+		issueOutput.appendLine(`PAT ${process.env.PAT}`);
 		const data = await createIssue('test', 'test');
 
 		// Display a message box to the user
 		window.showInformationMessage('createIssue from issuetracker!');
-		window.showInformationMessage(`test ${data}`);
+		window.showInformationMessage(`test ${data}}`);
 
 		// Write to output.
 		issueOutput.appendLine(`msg: ${data}`);
 	});
 	const disposableFour = commands.registerCommand('issuetracker.getIssues', async () => {
-		// The code you place here will be executed every time your command is executed
-
 		const data = await getIssues();
-
 		const issueTitles = JSON.stringify(data.map((d: any) => ({
 			issue: d.title,
 			state: d.state,
@@ -74,7 +67,7 @@ export function activate(context: ExtensionContext) {
 		issueOutput.appendLine(issueTitles);
 	});
 
-	const disposableFive = commands.registerCommand('nodeDependencies.refreshEntry', () => issueProvider.refresh());
+	const disposableFive = commands.registerCommand('issueTracker.refreshEntry', () => issueProvider.refresh());
 
 	context.subscriptions.push(disposable);
 	context.subscriptions.push(disposableTwo);

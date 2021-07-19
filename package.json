@@ -10,26 +10,51 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:issuetracker.helloWorld"
+    "onCommand:issuetracker.helloWorld",
+    "onView:issues"
   ],
   "main": "./out/extension.js",
   "contributes": {
+    "configuration": {
+      "title": "IssueTracker",
+      "properties": {
+        "issueTracker.gitLabPersonalAccessToken": {
+          "type": "string",
+          "default": false,
+          "description": "Gitlab Personal Access Token"
+        }
+      }
+    },
     "viewsContainers": {
       "activitybar": [
         {
-          "id": "issue-tracker",
-          "title": "Issue Tracker",
+          "id": "issue-explorer",
+          "title": "Issue Explorer",
           "icon": "src/media/logo.png"
         }
       ]
     },
     "views": {
-      "issue-tracker": [
+      "issue-explorer": [
         {
           "id": "issues",
-          "name": "Issues",
+          "name": "issues",
           "icon": "src/media/logo.png",
-          "contextualTitle": "Issue Explorer"
+          "contextualTitle": "Issues"
+        }
+      ]
+    },
+    "menus": {
+      "view/title": [
+        {
+          "command": "issueTracker.refreshEntry",
+          "when": "view == issues",
+          "group": "navigation"
+        },
+        {
+          "command": "issueTracker.convertTodoItems",
+          "when": "view == issues",
+          "group": "navigation"
         }
       ]
     },
@@ -37,6 +62,20 @@
       {
         "command": "issuetracker.helloWorld",
         "title": "Hello World"
+      },
+      {
+        "command": "issuetracker.createIssue",
+        "title": "Create Issue"
+      },
+      {
+        "command": "issueTracker.refreshEntry",
+        "title": "Refresh",
+        "icon": "src/media/refresh.png"
+      },
+      {
+        "command": "issueTracker.convertTodoItems",
+        "title": "Convert",
+        "icon": "src/media/export.png"
       }
     ]
   },
@@ -64,7 +103,8 @@
   },
   "dependencies": {
     "@jamesgmarks/utilities": "^0.4.17",
-    "node-env": "^0.1.6",
+    "@types/dotenv": "^8.2.0",
+    "dotenv": "^10.0.0",
     "node-fetch": "^2.6.1"
   }
 }

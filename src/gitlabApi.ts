@@ -1,10 +1,12 @@
 import { Hash } from '@jamesgmarks/utilities';
 import fetch from 'node-fetch';
+import { workspace } from 'vscode';
+
+const settings = workspace.getConfiguration('issueTracker');
+
 
 const GITLAB_ROOT_URL = 'https://gitlab.com/api/v4/projects/26602273';
-const PAT = `${process.env.PAT}`;
-//  const PAT = 'e43iLkyiYp4-QsCdZtwW';
-//const PROD_PAT = 'zYpMtPXAkBqSPWpWFSBV';
+const PAT = `${settings.gitLabPersonalAccessToken}`;
 export const gitFetch = async (uri: string, method: 'GET' | 'POST' | 'PUT' = 'GET', data: Hash = {}) => {
   const useUri = (
     uri.startsWith(GITLAB_ROOT_URL)

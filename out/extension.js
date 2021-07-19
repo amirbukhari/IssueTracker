@@ -16,6 +16,7 @@ const vscode_1 = require("vscode");
 const issues = require("./issues");
 const gitlabApi_1 = require("./gitlabApi");
 const issues_1 = require("./issues");
+const issueOutput = vscode_1.window.createOutputChannel('IssueTrac3ke2r');
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 function activate(context) {
@@ -28,29 +29,25 @@ function activate(context) {
     // Now provide the implementation of the command with registerCommand
     // The commandId parameter must match the command field in package.json
     const disposable = vscode_1.commands.registerCommand('issuetracker.helloWorld', () => {
-        // The code you place here will be executed every time your command is executed
-        // Display a message box to the user
         vscode_1.window.showInformationMessage('Hello World from issuetracker!');
     });
-    const disposableTwo = vscode_1.commands.registerCommand('issuetracker.clickLink', () => __awaiter(this, void 0, void 0, function* () {
-        // The code you place here will be executed every time your command is executed
+    const disposableTwo = vscode_1.commands.registerCommand('issuetracker.convertTodoItems', () => __awaiter(this, void 0, void 0, function* () {
         yield issues_1.convertTodoItems(vscode_1.workspace.rootPath || './');
         // Display a message box to the user
-        vscode_1.window.showInformationMessage('click link from issuetracker!');
+        vscode_1.window.showInformationMessage('converting todo items!');
     }));
     // Create output channel
     const issueOutput = vscode_1.window.createOutputChannel('IssueTracker');
     const disposableThree = vscode_1.commands.registerCommand('issuetracker.createIssue', () => __awaiter(this, void 0, void 0, function* () {
-        // The code you place here will be executed every time your command is executed
+        issueOutput.appendLine(`PAT ${process.env.PAT}`);
         const data = yield gitlabApi_1.createIssue('test', 'test');
         // Display a message box to the user
         vscode_1.window.showInformationMessage('createIssue from issuetracker!');
-        vscode_1.window.showInformationMessage(`test ${data}`);
+        vscode_1.window.showInformationMessage(`test ${data}}`);
         // Write to output.
         issueOutput.appendLine(`msg: ${data}`);
     }));
     const disposableFour = vscode_1.commands.registerCommand('issuetracker.getIssues', () => __awaiter(this, void 0, void 0, function* () {
-        // The code you place here will be executed every time your command is executed
         const data = yield gitlabApi_1.getIssues();
         const issueTitles = JSON.stringify(data.map((d) => ({
             issue: d.title,
@@ -64,7 +61,7 @@ function activate(context) {
         // Write to output.
         issueOutput.appendLine(issueTitles);
     }));
-    const disposableFive = vscode_1.commands.registerCommand('nodeDependencies.refreshEntry', () => issueProvider.refresh());
+    const disposableFive = vscode_1.commands.registerCommand('issueTracker.refreshEntry', () => issueProvider.refresh());
     context.subscriptions.push(disposable);
     context.subscriptions.push(disposableTwo);
     context.subscriptions.push(disposableThree);

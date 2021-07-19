@@ -11,10 +11,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getIssues = exports.createIssue = exports.gitFetch = void 0;
 const node_fetch_1 = require("node-fetch");
+const vscode_1 = require("vscode");
+const settings = vscode_1.workspace.getConfiguration('issueTracker');
 const GITLAB_ROOT_URL = 'https://gitlab.com/api/v4/projects/26602273';
-const PAT = `${process.env.PAT}`;
-//  const PAT = 'e43iLkyiYp4-QsCdZtwW';
-//const PROD_PAT = 'zYpMtPXAkBqSPWpWFSBV';
+const PAT = `${settings.gitLabPersonalAccessToken}`;
 const gitFetch = (uri, method = 'GET', data = {}) => __awaiter(void 0, void 0, void 0, function* () {
     const useUri = (uri.startsWith(GITLAB_ROOT_URL)
         ? uri

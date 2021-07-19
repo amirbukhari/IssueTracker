@@ -19,7 +19,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.IssuesProvider = exports.convertTodoItems = exports.flattenOnce = void 0;
 /* eslint-disable no-empty-function */
 /* eslint-disable class-methods-use-this */
-/* eslint-disable import/no-unresolved */
 // eslint-disable-next-line max-classes-per-file
 const vscode = require("vscode");
 const fs = require("fs");
@@ -49,11 +48,15 @@ class Issue extends vscode.TreeItem {
 const flattenOnce = (usageOrCostArray) => (usageOrCostArray.reduce((acc, curr) => [...acc, ...curr], []));
 exports.flattenOnce = flattenOnce;
 const getAllFiles = (dirPath, arrayOfFiles) => {
+    const foldersToIgnore = ['node_modules', '.vscode'];
     const files = fs.readdirSync(dirPath);
     let _arrayOfFiles = arrayOfFiles || [];
     files.forEach((file) => {
+        issueOutput.appendLine(`file ${file}`);
         if (fs.statSync(`${dirPath}/${file}`).isDirectory()) {
-            _arrayOfFiles = getAllFiles(`${dirPath}/${file}`, _arrayOfFiles);
+            _arrayOfFiles = (!foldersToIgnore.includes(`${file}`)
+                ? getAllFiles(`${dirPath}/${file}`, _arrayOfFiles)
+                : _arrayOfFiles);
         }
         else if (file.includes('.ts')) {
             _arrayOfFiles.push(path.join(dirPath, '/', file));
@@ -74,11 +77,15 @@ const getIssueItems = (workspaceRoot) => __awaiter(void 0, void 0, void 0, funct
         let lineNumber = 0;
         rl.on('line', (line) => {
             lineNumber++;
-            const containsIssue = line.toLowerCase().includes('issue:');
+            const loweredCasedLine = line.toLowerCase();
+            const isIssue = loweredCasedLine.includes('issue:');
+            const isTodo = loweredCasedLine.includes('todo:');
+            const containsIssue = isIssue || isTodo;
             if (containsIssue) {
                 const splitString = line.split(':');
-                const issueNumber = splitString[1];
-                const issue = new Issue(`issue ${issueNumber}`, `${i}`, vscode.TreeItemCollapsibleState.Collapsed, line, lineNumber);
+                const issueComment = splitString[1];
+                const issueDesc = isIssue ? `ISSUE: ${issueComment}` : `TODO: ${issueComment}`;
+                const issue = new Issue(issueDesc, `${i}`, vscode.TreeItemCollapsibleState.Collapsed, line, lineNumber);
                 issues.push(issue);
             }
         });

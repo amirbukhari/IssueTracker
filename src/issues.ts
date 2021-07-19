@@ -1,6 +1,5 @@
 /* eslint-disable no-empty-function */
 /* eslint-disable class-methods-use-this */
-/* eslint-disable import/no-unresolved */
 // eslint-disable-next-line max-classes-per-file
 import * as vscode from 'vscode';
 import * as fs from 'fs';
@@ -38,13 +37,19 @@ export const flattenOnce = <T>(usageOrCostArray: Array<Array<T>>): T[] => (
 );
 
 const getAllFiles = (dirPath: string, arrayOfFiles: string[]) => {
+  const foldersToIgnore = ['node_modules', '.vscode'];
   const files = fs.readdirSync(dirPath);
 
   let _arrayOfFiles = arrayOfFiles || [];
 
   files.forEach((file) => {
+    issueOutput.appendLine(`file ${file}`);
     if (fs.statSync(`${dirPath}/${file}`).isDirectory()) {
-      _arrayOfFiles = getAllFiles(`${dirPath}/${file}`, _arrayOfFiles);
+      _arrayOfFiles = (
+        !foldersToIgnore.includes(`${file}`)
+          ? getAllFiles(`${dirPath}/${file}`, _arrayOfFiles)
+          : _arrayOfFiles
+      );
     } else if (file.includes('.ts')) {
       _arrayOfFiles.push(path.join(dirPath, '/', file));
     }
@@ -52,6 +57,8 @@ const getAllFiles = (dirPath: string, arrayOfFiles: string[]) => {
 
   return arrayOfFiles;
 };
+
+
 
 const getIssueItems = async (workspaceRoot: string): Promise<Issue[]> => {
   const dirItems = getAllFiles(workspaceRoot, []);
@@ -68,13 +75,17 @@ const getIssueItems = async (workspaceRoot: string): Promise<Issue[]> => {
     let lineNumber = 0;
     rl.on('line', (line: string) => {
       lineNumber++;
-      const containsIssue = line.toLowerCase().includes('issue:');
+      const loweredCasedLine = line.toLowerCase();
+      const isIssue = loweredCasedLine.includes('issue:');
+      const isTodo = loweredCasedLine.includes('todo:');
+      const containsIssue =  isIssue || isTodo ;
       if (containsIssue) {
         const splitString = line.split(':');
-        const issueNumber = splitString[1];
+        const issueComment = splitString[1];
 
+        const issueDesc = isIssue? `ISSUE: ${issueComment}` : `TODO: ${issueComment}`;
         const issue = new Issue(
-          `issue ${issueNumber}`,
+          issueDesc,
           `${i}`,
           vscode.TreeItemCollapsibleState.Collapsed,
           line,
@@ -91,6 +102,7 @@ const getIssueItems = async (workspaceRoot: string): Promise<Issue[]> => {
 };
 
 export const convertTodoItems = async (workspaceRoot: string) => {
+
   const dirItems = getAllFiles(workspaceRoot, []);
   // const dirItems = ['C:/Users/Amir/Documents/Rentsync/billing-system/src/tools/mail/sendgrid.ts'];
   // TODO:
