@@ -13,6 +13,8 @@ import { createIssue } from './gitlabApi';
 
 const issueOutput = window.createOutputChannel('IssueTracke2r');
 
+const settings = workspace.getConfiguration('issueTracker');
+
 export class Issue extends vscode.TreeItem {
   constructor(
     public readonly label: string,
@@ -174,7 +176,7 @@ export class IssuesProvider implements vscode.TreeDataProvider<Issue> {
 
   async getChildren(element?: Issue): Promise<Issue[]> {
     if (element) {
-      const gitlabLink  = `https://gitlab.com/llws/platform/billing-system/-/issues/${element.issueNumber}`;
+      const gitlabLink  = `${settings.get('gitLabProjectURL')}/-/issues/${element.issueNumber}`;
       const item = new Issue(
         `View in Gitlab`,
         gitlabLink,

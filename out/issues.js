@@ -21,6 +21,7 @@ const readline = require("readline");
 const events_1 = require("events");
 const utilities_1 = require("@jamesgmarks/utilities");
 const issueOutput = vscode_1.window.createOutputChannel('IssueTracke2r');
+const settings = vscode_1.workspace.getConfiguration('issueTracker');
 class Issue extends vscode.TreeItem {
     constructor(label, description, collapsibleState, issueNumber, line, lineNumber, isParent, gitLabLink) {
         super(label, collapsibleState);
@@ -154,7 +155,7 @@ class IssuesProvider {
     getChildren(element) {
         return __awaiter(this, void 0, void 0, function* () {
             if (element) {
-                const gitlabLink = `https://gitlab.com/llws/platform/billing-system/-/issues/${element.issueNumber}`;
+                const gitlabLink = `${settings.get('gitLabProjectURL')}/-/issues/${element.issueNumber}`;
                 const item = new Issue(`View in Gitlab`, gitlabLink, vscode.TreeItemCollapsibleState.None, element.issueNumber, element.line, element.lineNumber, false, gitlabLink);
                 item.command = {
                     command: "issues.openGitlabLink",
