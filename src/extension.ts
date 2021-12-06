@@ -2,7 +2,7 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import {
-	ExtensionContext, commands, window, workspace,
+	ExtensionContext, commands, window, workspace, env, Uri,
 
 } from 'vscode';
 
@@ -10,14 +10,18 @@ import fetch from 'node-fetch';
 import { Hash } from '@jamesgmarks/utilities';
 import * as issues from './issues';
 import { createIssue, getIssues } from './gitlabApi';
-import { convertTodoItems } from './issues';
+// import { convertTodoItems } from './issues';
 
-const issueOutput = window.createOutputChannel('IssueTrac3ke2r');
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: ExtensionContext) {
 	const issueProvider = new issues.IssuesProvider(workspace.rootPath || './');
 	window.registerTreeDataProvider('issues', issueProvider);
+	commands.registerCommand("issues.openGitlabLink", (item:issues.Issue) => {
+		console.log(item.label);
+		window.showInformationMessage(item.gitLabLink ?? '');
+		env.openExternal(Uri.parse(item.gitLabLink ?? ''));
+});
 
 	// Use the console to output diagnostic information (console.log) and errors (console.error)
 	// This line of code will only be executed once when your extension is activated
@@ -30,11 +34,11 @@ export function activate(context: ExtensionContext) {
 		window.showInformationMessage('Hello World from issuetracker!');
 	});
 
-	const disposableTwo = commands.registerCommand('issuetracker.convertTodoItems', async () => {
-		await convertTodoItems(workspace.rootPath || './');
-		// Display a message box to the user
-		window.showInformationMessage('converting todo items!');
-	});
+	// const disposableTwo = commands.registerCommand('issuetracker.convertTodoItems', async () => {
+	// 	await convertTodoItems(workspace.rootPath || './');
+	// 	// Display a message box to the user
+	// 	window.showInformationMessage('converting todo items!');
+	// });
 
 	// Create output channel
 	const issueOutput = window.createOutputChannel('IssueTracker');
@@ -50,6 +54,7 @@ export function activate(context: ExtensionContext) {
 		// Write to output.
 		issueOutput.appendLine(`msg: ${data}`);
 	});
+
 	const disposableFour = commands.registerCommand('issuetracker.getIssues', async () => {
 		const data = await getIssues();
 		const issueTitles = JSON.stringify(data.map((d: any) => ({
@@ -70,7 +75,7 @@ export function activate(context: ExtensionContext) {
 	const disposableFive = commands.registerCommand('issueTracker.refreshEntry', () => issueProvider.refresh());
 
 	context.subscriptions.push(disposable);
-	context.subscriptions.push(disposableTwo);
+	// context.subscriptions.push(disposableTwo);
 	context.subscriptions.push(disposableThree);
 	context.subscriptions.push(disposableFour);
 	context.subscriptions.push(disposableFive);

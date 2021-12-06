@@ -22,6 +22,11 @@
           "type": "string",
           "default": false,
           "description": "Gitlab Personal Access Token"
+        },
+        "issueTracker.gitLabProjectURL": {
+          "type": "string",
+          "default": false,
+          "description": "Gitlab Project URL"
         }
       }
     },
@@ -50,11 +55,6 @@
           "command": "issueTracker.refreshEntry",
           "when": "view == issues",
           "group": "navigation"
-        },
-        {
-          "command": "issueTracker.convertTodoItems",
-          "when": "view == issues",
-          "group": "navigation"
         }
       ]
     },
@@ -71,11 +71,6 @@
         "command": "issueTracker.refreshEntry",
         "title": "Refresh",
         "icon": "src/media/refresh.png"
-      },
-      {
-        "command": "issueTracker.convertTodoItems",
-        "title": "Convert",
-        "icon": "src/media/export.png"
       }
     ]
   },

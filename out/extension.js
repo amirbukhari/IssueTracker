@@ -15,13 +15,18 @@ exports.deactivate = exports.activate = void 0;
 const vscode_1 = require("vscode");
 const issues = require("./issues");
 const gitlabApi_1 = require("./gitlabApi");
-const issues_1 = require("./issues");
-const issueOutput = vscode_1.window.createOutputChannel('IssueTrac3ke2r');
+// import { convertTodoItems } from './issues';
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 function activate(context) {
     const issueProvider = new issues.IssuesProvider(vscode_1.workspace.rootPath || './');
     vscode_1.window.registerTreeDataProvider('issues', issueProvider);
+    vscode_1.commands.registerCommand("issues.openGitlabLink", (item) => {
+        var _a, _b;
+        console.log(item.label);
+        vscode_1.window.showInformationMessage((_a = item.gitLabLink) !== null && _a !== void 0 ? _a : '');
+        vscode_1.env.openExternal(vscode_1.Uri.parse((_b = item.gitLabLink) !== null && _b !== void 0 ? _b : ''));
+    });
     // Use the console to output diagnostic information (console.log) and errors (console.error)
     // This line of code will only be executed once when your extension is activated
     console.log('Congratulations, your extension "issuetracker" is now active!');
@@ -31,11 +36,11 @@ function activate(context) {
     const disposable = vscode_1.commands.registerCommand('issuetracker.helloWorld', () => {
         vscode_1.window.showInformationMessage('Hello World from issuetracker!');
     });
-    const disposableTwo = vscode_1.commands.registerCommand('issuetracker.convertTodoItems', () => __awaiter(this, void 0, void 0, function* () {
-        yield issues_1.convertTodoItems(vscode_1.workspace.rootPath || './');
-        // Display a message box to the user
-        vscode_1.window.showInformationMessage('converting todo items!');
-    }));
+    // const disposableTwo = commands.registerCommand('issuetracker.convertTodoItems', async () => {
+    // 	await convertTodoItems(workspace.rootPath || './');
+    // 	// Display a message box to the user
+    // 	window.showInformationMessage('converting todo items!');
+    // });
     // Create output channel
     const issueOutput = vscode_1.window.createOutputChannel('IssueTracker');
     const disposableThree = vscode_1.commands.registerCommand('issuetracker.createIssue', () => __awaiter(this, void 0, void 0, function* () {
@@ -63,7 +68,7 @@ function activate(context) {
     }));
     const disposableFive = vscode_1.commands.registerCommand('issueTracker.refreshEntry', () => issueProvider.refresh());
     context.subscriptions.push(disposable);
-    context.subscriptions.push(disposableTwo);
+    // context.subscriptions.push(disposableTwo);
     context.subscriptions.push(disposableThree);
     context.subscriptions.push(disposableFour);
     context.subscriptions.push(disposableFive);
