@@ -42,16 +42,16 @@ export const flattenOnce = <T>(usageOrCostArray: Array<Array<T>>): T[] => (
 );
 
 const getAllFiles = (dirPath: string, arrayOfFiles: string[]) => {
-  const foldersToIgnore = ['node_modules', '.vscode'];
+  const foldersToIgnore:string[] = settings.get('foldersToIgnore') ?? [];
   const files = fs.readdirSync(dirPath);
-
+  const pathFromWorkspaceRoot = dirPath.replace(workspace.rootPath ?? '','');
   let _arrayOfFiles = arrayOfFiles || [];
 
   files.forEach((file) => {
-    issueOutput.appendLine(`file ${file}`);
     if (fs.statSync(`${dirPath}/${file}`).isDirectory()) {
+        issueOutput.appendLine(`.${pathFromWorkspaceRoot}/${file}`);
       _arrayOfFiles = (
-        !foldersToIgnore.includes(`${file}`)
+        !foldersToIgnore.includes(`.${pathFromWorkspaceRoot}/${file}`)
           ? getAllFiles(`${dirPath}/${file}`, _arrayOfFiles)
           : _arrayOfFiles
       );
@@ -177,7 +177,7 @@ export class IssuesProvider implements vscode.TreeDataProvider<Issue> {
   async getChildren(element?: Issue): Promise<Issue[]> {
     if (element) {
       const gitlabLink  = `${settings.get('gitLabProjectURL')}/-/issues/${element.issueNumber}`;
-      const item = new Issue(
+      const gitlabLinkItem = new Issue(
         `View in Gitlab`,
         gitlabLink,
         vscode.TreeItemCollapsibleState.None,
@@ -187,12 +187,12 @@ export class IssuesProvider implements vscode.TreeDataProvider<Issue> {
         false,
         gitlabLink
       );
-      item.command = {
+      gitlabLinkItem.command = {
         command: "issues.openGitlabLink",
         title: "Select Node",
-        arguments: [item]
+        arguments: [gitlabLinkItem]
     };
-      return [item];
+      return [gitlabLinkItem];
     }
     return getIssueItems(this.workspaceRoot);
   }

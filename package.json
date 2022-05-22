@@ -27,6 +27,11 @@
           "type": "string",
           "default": false,
           "description": "Gitlab Project URL"
+        },
+        "issueTracker.foldersToIgnore": {
+          "type": "array",
+          "default": false,
+          "description": "Folders to Ignore"
         }
       }
     },
@@ -35,7 +40,7 @@
         {
           "id": "issue-explorer",
           "title": "Issue Explorer",
-          "icon": "src/media/logo.png"
+          "icon": "./src/media/logo.png"
         }
       ]
     },
@@ -44,7 +49,7 @@
         {
           "id": "issues",
           "name": "issues",
-          "icon": "src/media/logo.png",
+          "icon": "./src/media/logo.png",
           "contextualTitle": "Issues"
         }
       ]
@@ -70,7 +75,7 @@
       {
         "command": "issueTracker.refreshEntry",
         "title": "Refresh",
-        "icon": "src/media/refresh.png"
+        "icon": "./src/media/refresh.png"
       }
     ]
   },
@@ -97,7 +102,7 @@
     "vscode-test": "^1.5.0"
   },
   "dependencies": {
-    "@jamesgmarks/utilities": "^0.4.17",
+    "@jamesgmarks/utilities": "^0.4.36",
     "@types/dotenv": "^8.2.0",
     "dotenv": "^10.0.0",
     "node-fetch": "^2.6.1"

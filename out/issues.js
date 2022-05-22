@@ -45,13 +45,15 @@ exports.Issue = Issue;
 const flattenOnce = (usageOrCostArray) => (usageOrCostArray.reduce((acc, curr) => [...acc, ...curr], []));
 exports.flattenOnce = flattenOnce;
 const getAllFiles = (dirPath, arrayOfFiles) => {
-    const foldersToIgnore = ['node_modules', '.vscode'];
+    var _a, _b;
+    const foldersToIgnore = (_a = settings.get('foldersToIgnore')) !== null && _a !== void 0 ? _a : [];
     const files = fs.readdirSync(dirPath);
+    const pathFromWorkspaceRoot = dirPath.replace((_b = vscode_1.workspace.rootPath) !== null && _b !== void 0 ? _b : '', '');
     let _arrayOfFiles = arrayOfFiles || [];
     files.forEach((file) => {
-        issueOutput.appendLine(`file ${file}`);
         if (fs.statSync(`${dirPath}/${file}`).isDirectory()) {
-            _arrayOfFiles = (!foldersToIgnore.includes(`${file}`)
+            issueOutput.appendLine(`.${pathFromWorkspaceRoot}/${file}`);
+            _arrayOfFiles = (!foldersToIgnore.includes(`.${pathFromWorkspaceRoot}/${file}`)
                 ? getAllFiles(`${dirPath}/${file}`, _arrayOfFiles)
                 : _arrayOfFiles);
         }
@@ -156,13 +158,13 @@ class IssuesProvider {
         return __awaiter(this, void 0, void 0, function* () {
             if (element) {
                 const gitlabLink = `${settings.get('gitLabProjectURL')}/-/issues/${element.issueNumber}`;
-                const item = new Issue(`View in Gitlab`, gitlabLink, vscode.TreeItemCollapsibleState.None, element.issueNumber, element.line, element.lineNumber, false, gitlabLink);
-                item.command = {
+                const gitlabLinkItem = new Issue(`View in Gitlab`, gitlabLink, vscode.TreeItemCollapsibleState.None, element.issueNumber, element.line, element.lineNumber, false, gitlabLink);
+                gitlabLinkItem.command = {
                     command: "issues.openGitlabLink",
                     title: "Select Node",
-                    arguments: [item]
+                    arguments: [gitlabLinkItem]
                 };
-                return [item];
+                return [gitlabLinkItem];
             }
             return getIssueItems(this.workspaceRoot);
         });
