@@ -15,7 +15,7 @@ In settings.json provide the link to your proejct
 ```json
   "issueTracker.gitLabProjectURL": "https://gitlab.com/???/???/???"
 ```
-Specify which files to ignore
+Specify which files to ignore. It's important to ignore folders such as "./.git" to reduce compute time and only show you issues relevant to your project.
  ```json
     "issueTracker.foldersToIgnore":[
         "./.git",
