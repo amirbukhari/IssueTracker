@@ -13,7 +13,7 @@ VSCode extension for quickly getting to gitlab issues from within VSCode
 ## Extension Settings
 In settings.json provide the link to your proejct
 ```json
-  "issueTracker.gitLabProjectURL": "https://gitlab.com/???/???/???",
+  "issueTracker.gitLabProjectURL": "https://gitlab.com/???/???/???"
 ```
 Specify which files to ignore
  ```json
