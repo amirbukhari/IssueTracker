@@ -1,24 +1,144 @@
 {
-    "root": true,
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
-        "ecmaVersion": 6,
-        "sourceType": "module"
+      "ecmaVersion": 2018,
+      "sourceType": "module"
     },
+    "extends": [
+      "airbnb-base"
+    ],
     "plugins": [
-        "@typescript-eslint"
+      "@typescript-eslint"
     ],
     "rules": {
-        "@typescript-eslint/naming-convention": "warn",
-        "@typescript-eslint/semi": "warn",
-        "curly": "warn",
-        "eqeqeq": "warn",
-        "no-throw-literal": "warn",
-        "semi": "off"
+      "@typescript-eslint/no-explicit-any": [
+        "warn",
+        {
+          "ignoreRestArgs": true
+        }
+      ],
+      "@typescript-eslint/no-unused-vars": "warn",
+      "@typescript-eslint/semi": "warn",
+      "@typescript-eslint/type-annotation-spacing": "error",
+      "array-bracket-spacing": "off",
+      "brace-style": [
+        "warn",
+        "1tbs",
+        {
+          "allowSingleLine": true
+        }
+      ],
+      "comma-dangle": [
+        2,
+        "always-multiline"
+      ],
+      "comma-spacing": "error",
+      "curly": [
+        "error",
+        "all"
+      ],
+      "function-paren-newline": [
+        "warn",
+        "consistent"
+      ],
+      "indent": [
+        "warn",
+        2
+      ],
+      "key-spacing": "warn",
+      "lines-between-class-members": "off",
+      "linebreak-style": "off",
+      "max-len": [
+        "error",
+        {
+          "ignoreComments": true,
+          "code": 120
+        }
+      ],
+      "no-console": [
+        "warn",
+        {
+          "allow": [
+            "warn",
+            "error",
+            "info"
+          ]
+        }
+      ],
+      "no-multiple-empty-lines": [
+        "warn",
+        {
+          "max": 1,
+          "maxEOF": 1
+        }
+      ],
+      "no-plusplus": "off",
+      "no-undef": "off",
+      "no-underscore-dangle": "off",
+      "no-unused-vars": "off",
+      "object-curly-newline": [
+        "error",
+        {
+          "ObjectExpression": {
+            "minProperties": 6,
+            "multiline": true,
+            "consistent": true
+          },
+          "ObjectPattern": {
+            "minProperties": 6,
+            "multiline": true,
+            "consistent": true
+          },
+          "ImportDeclaration": {
+            "minProperties": 6,
+            "multiline": true,
+            "consistent": true
+          },
+          "ExportDeclaration": {
+            "minProperties": 6,
+            "multiline": true,
+            "consistent": true
+          }
+        }
+      ],
+      "import/no-unresolved": "off",
+      "quotes": [
+        "error",
+        "single",
+        {
+          "allowTemplateLiterals": true
+        }
+      ],
+      "semi": "off",
+      "import/prefer-default-export": "off",
+      "import/extensions": [
+        "off",
+        "never"
+      ],
+      "template-curly-spacing": [
+        "warn",
+        "never"
+      ]
+    },
+    "settings": {
+      "import/resolver": {
+        "node": {
+          "extensions": [
+            ".js",
+            ".jsx",
+            ".ts",
+            ".tsx"
+          ]
+        }
+      }
+    },
+    "env": {
+      "jest": true,
+      "node": true
     },
     "ignorePatterns": [
-        "out",
-        "dist",
-        "**/*.d.ts"
+      "./dist/**/*",
+      "./coverage/**/*"
     ]
-}
+  }
+  

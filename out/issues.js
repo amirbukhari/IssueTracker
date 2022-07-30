@@ -20,7 +20,7 @@ const vscode_1 = require("vscode");
 const readline = require("readline");
 const events_1 = require("events");
 const utilities_1 = require("@jamesgmarks/utilities");
-// import { createIssue } from './gitlabApi';
+const helpers_1 = require("./helpers");
 const issueOutput = vscode_1.window.createOutputChannel('IssueTracker');
 const settings = vscode_1.workspace.getConfiguration('issueTracker');
 class Issue extends vscode.TreeItem {
@@ -45,28 +45,28 @@ class Issue extends vscode.TreeItem {
 exports.Issue = Issue;
 const flattenOnce = (usageOrCostArray) => (usageOrCostArray.reduce((acc, curr) => [...acc, ...curr], []));
 exports.flattenOnce = flattenOnce;
-const getAllFiles = (dirPath, arrayOfFiles) => {
-    var _a, _b;
-    const foldersToIgnore = (_a = settings.get('foldersToIgnore')) !== null && _a !== void 0 ? _a : [];
-    const files = fs.readdirSync(dirPath);
-    const pathFromWorkspaceRoot = dirPath.replace((_b = vscode_1.workspace.rootPath) !== null && _b !== void 0 ? _b : '', '');
-    let _arrayOfFiles = arrayOfFiles || [];
-    files.forEach((file) => {
-        if (fs.statSync(`${dirPath}/${file}`).isDirectory()) {
-            issueOutput.appendLine(`.${pathFromWorkspaceRoot}/${file}`);
-            _arrayOfFiles = (!foldersToIgnore.includes(`.${pathFromWorkspaceRoot}/${file}`)
-                ? getAllFiles(`${dirPath}/${file}`, _arrayOfFiles)
-                : _arrayOfFiles);
-        }
-        else if (file.includes('.ts')) {
-            issueOutput.appendLine(`.${pathFromWorkspaceRoot}/${file}`);
-            _arrayOfFiles.push(path.join(dirPath, '/', file));
-        }
-    });
-    return arrayOfFiles;
-};
+// const getAllFiles = (dirPath: string, arrayOfFiles: string[]) => {
+//   const foldersToIgnore: string[] = settings.get('foldersToIgnore') ?? [];
+//   const files = fs.readdirSync(dirPath);
+//   const pathFromWorkspaceRoot = dirPath.replace(workspace.rootPath ?? '', '');
+//   let _arrayOfFiles = arrayOfFiles || [];
+//   files.forEach((file) => {
+//     if (fs.statSync(`${dirPath}/${file}`).isDirectory()) {
+//       issueOutput.appendLine(`.${pathFromWorkspaceRoot}/${file}`);
+//       _arrayOfFiles = (
+//         !foldersToIgnore.includes(`.${pathFromWorkspaceRoot}/${file}`)
+//           ? getAllFiles(`${dirPath}/${file}`, _arrayOfFiles)
+//           : _arrayOfFiles
+//       );
+//     } else if (file.includes('.ts')) {
+//       issueOutput.appendLine(`.${pathFromWorkspaceRoot}/${file}`);
+//       _arrayOfFiles.push(path.join(dirPath, '/', file));
+//     }
+//   });
+//   return arrayOfFiles;
+// };
 const getIssueItems = (workspaceRoot) => __awaiter(void 0, void 0, void 0, function* () {
-    const dirItems = getAllFiles(workspaceRoot, []);
+    const dirItems = helpers_1.getAllFiles(workspaceRoot);
     issueOutput.appendLine(`GOT ALL FILES`);
     const issueItems = yield utilities_1.mapAsync(dirItems, (file, i) => __awaiter(void 0, void 0, void 0, function* () {
         const fileName = file.replace(/\\/g, '/');

@@ -5,70 +5,43 @@ import {
 	ExtensionContext, commands, window, workspace, env, Uri, Location,
 } from 'vscode';
 
-import fetch from 'node-fetch';
-import { Hash } from '@jamesgmarks/utilities';
 import * as issues from './issues';
-// import { createIssue, getIssues } from './gitlabApi';
-// import { convertTodoItems } from './issues';
+
+
+const openEditorLink = async (uri: Uri, item: issues.Issue) => {
+	const openEditor = await commands.executeCommand<Location[]>(
+		'vscode.open',
+		uri
+	)
+	const scrollToLine = await commands.executeCommand<Location[]>(
+		'revealLine',
+		{
+			lineNumber: item.lineNumber,
+			at: 'center'
+		}
+	);
+}
+
+
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: ExtensionContext) {
 	const issueProvider = new issues.IssuesProvider(workspace.rootPath || './');
 	window.registerTreeDataProvider('issues', issueProvider);
-	commands.registerCommand("issues.openGitlabLink", (item:issues.Issue) => {
-		console.log(item.label);
-		window.showInformationMessage( item.gitLabLink ?? '');
+
+	commands.registerCommand("issues.openGitlabLink", (item: issues.Issue) => {
+		window.showInformationMessage(item.gitLabLink ?? '');
 		env.openExternal(Uri.parse(item.gitLabLink ?? ''));
-		// const activeEditor = window.activeTextEditor;
-		// if(!activeEditor){
-		// 	window.showInformationMessage(`No active editor`);
-		// 	throw new Error('No active editor');
-		// }else { 
-		// 	window.showInformationMessage(`${item.fileName} ${item.lineNumber}`);
-		// }
-		// const definitions = commands.executeCommand<Location[]>(
-		// 	'editor.action.goToLocations',
-		// 	item.fileName, 
-		// 	item.lineNumber
-		// );
-});
-
-commands.registerCommand("issues.openEditorLink", (item:issues.Issue) => {
-	console.log(item.label);
-	// window.showInformationMessage( item.gitLabLink ?? '');
-	// env.openExternal(Uri.parse(item.gitLabLink ?? ''));
-	const activeEditor = window.activeTextEditor;
-	if(!activeEditor){
-		window.showInformationMessage(`No active editor`);
-		throw new Error('No active editor');
-	}else { 
-		window.showInformationMessage(`${item.fileName} ${item.lineNumber} - TES4T253`);
-	}
-	// const definitions = commands.executeCommand<Location[]>(
-	// 	'editor.action.goToLocations',
-	// 	item.fileName, 
-	// 	item.lineNumber
-	// );
-
-	const uriString = `${workspace.rootPath}${item.fileName?.replace('.','')}`;
-	const uri = Uri.file(`${uriString}`);
-	window.showInformationMessage(`${uriString}`);
-	const definitions = commands.executeCommand<Location[]>(
-		'vscode.open',
-		uri
-	).then(()=>{
-		const definitionsTwo = commands.executeCommand<Location[]>(
-		'revealLine',
-		{
-			lineNumber: item.lineNumber,
-			at:'center'
-		}
-	);
 	});
 
-	
-});
+	commands.registerCommand("issues.openEditorLink", (item: issues.Issue) => {
+		const uriString = `${workspace.rootPath}${item.fileName?.replace('.', '')}`;
+		const uri = Uri.file(`${uriString}`);
+		window.showInformationMessage(`${uriString}`);
+		openEditorLink(uri, item);
+
+	});
 	// Use the console to output diagnostic information (console.log) and errors (console.error)
 	// This line of code will only be executed once when your extension is activated
 	console.log('Congratulations, your extension "issuetracker" is now active!');

@@ -25,8 +25,28 @@
         },
         "issueTracker.foldersToIgnore": {
           "type": "array",
-          "default": false,
+          "default": [
+            "./dist",
+            "./.git",
+            "./coverage",
+            "./node_modules",
+            "./src/hydra-ui/node_modules",
+            "./src/downloads",
+            "./src/email-templates",
+            "./src/freshbooks-api",
+            "./src/uploads",
+            "./src/test",
+            "./out",
+            "./media"
+          ],
           "description": "Folders to Ignore"
+        },
+        "issueTracker.fileTypes": {
+          "type": "array",
+          "default": [
+            ".ts"
+          ],
+          "description": "File types to check for issues numbers"
         }
       }
     },
