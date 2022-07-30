@@ -8,10 +8,10 @@ import { window, workspace } from 'vscode';
 import { resolve } from 'path';
 import * as readline from 'readline';
 import { once } from 'events';
-import { mapAsync } from '@jamesgmarks/utilities';
-import { createIssue } from './gitlabApi';
+import { mapAsync, mapAsyncSequential } from '@jamesgmarks/utilities';
+// import { createIssue } from './gitlabApi';
 
-const issueOutput = window.createOutputChannel('IssueTracke2r');
+const issueOutput = window.createOutputChannel('IssueTracker');
 
 const settings = workspace.getConfiguration('issueTracker');
 
@@ -24,11 +24,11 @@ export class Issue extends vscode.TreeItem {
     public line?: string,
     public lineNumber?: number,
     public isParent?: boolean,
-    public gitLabLink?: string
+    public gitLabLink?: string | null,
+    public fileName?: string, 
   ) {
     super(label, collapsibleState);
     this.tooltip = `${this.label}-${this.issueNumber}`;
-    // this.description = this.issueNumber;
   }
 
   iconPath = {
@@ -49,13 +49,14 @@ const getAllFiles = (dirPath: string, arrayOfFiles: string[]) => {
 
   files.forEach((file) => {
     if (fs.statSync(`${dirPath}/${file}`).isDirectory()) {
-        issueOutput.appendLine(`.${pathFromWorkspaceRoot}/${file}`);
+       issueOutput.appendLine(`.${pathFromWorkspaceRoot}/${file}`);
       _arrayOfFiles = (
         !foldersToIgnore.includes(`.${pathFromWorkspaceRoot}/${file}`)
           ? getAllFiles(`${dirPath}/${file}`, _arrayOfFiles)
           : _arrayOfFiles
       );
     } else if (file.includes('.ts')) {
+      issueOutput.appendLine(`.${pathFromWorkspaceRoot}/${file}`);
       _arrayOfFiles.push(path.join(dirPath, '/', file));
     }
   });
@@ -67,10 +68,14 @@ const getAllFiles = (dirPath: string, arrayOfFiles: string[]) => {
 
 const getIssueItems = async (workspaceRoot: string): Promise<Issue[]> => {
   const dirItems = getAllFiles(workspaceRoot, []);
+  issueOutput.appendLine(`GOT ALL FILES`);
   
   const issueItems = await mapAsync(dirItems, async (file: string, i: number) => {
     const fileName = file.replace(/\\/g, '/');
     const localFileName = fileName.replace(workspaceRoot,'.');
+
+    issueOutput.appendLine(`READING FILE ${localFileName}`);
+
 
     const rl = readline.createInterface({
       input: fs.createReadStream(fileName),
@@ -78,15 +83,18 @@ const getIssueItems = async (workspaceRoot: string): Promise<Issue[]> => {
     });
     const issues: Issue[] = [];
     let lineNumber = 0;
+   
     rl.on('line', (line: string) => {
+      issueOutput.appendLine(` READING FILE line ${lineNumber} - ${localFileName}`);
       lineNumber++;
       const loweredCasedLine = line.toLowerCase();
-      if (loweredCasedLine.includes('issue:')) {
+      if (line.includes('(ISSUE:')) {
         const splitStringBeforeIssue = line.split('(ISSUE:');
         const issueNumber = splitStringBeforeIssue[1].replace(')','').replace('#','');
         const issueComment = splitStringBeforeIssue[0].split('//')[1];
         const issueLabel = `ISSUE:#${issueNumber}: ${issueComment}`;
         const issueDescription = `${localFileName} - ${lineNumber} `;
+        issueOutput.appendLine(localFileName);
         const isParent = true;
         const issue = new Issue(
           issueLabel,
@@ -95,10 +103,18 @@ const getIssueItems = async (workspaceRoot: string): Promise<Issue[]> => {
           issueNumber,
           issueComment,
           lineNumber,
-          isParent
+          isParent,
+          null,
+          localFileName
         );
         issues.push(issue);
       }
+    });
+    rl.on('close',(error: any) => {
+      issueOutput.appendLine(`FINISHED READING FILE ${localFileName}`);
+    });
+    rl.on('pause', () => {
+      console.log('Readline paused.');
     });
     await once(rl, 'close');
     return issues;
@@ -107,65 +123,10 @@ const getIssueItems = async (workspaceRoot: string): Promise<Issue[]> => {
   return flattenOnce(issueItems);
 };
 
-// export const convertTodoItems = async (workspaceRoot: string) => {
-
-//   const dirItems = getAllFiles(workspaceRoot, []);
-//   // const dirItems = ['C:/Users/Amir/Documents/Rentsync/billing-system/src/tools/mail/sendgrid.ts'];
-//   // TODO:
-//   const files = await mapAsync(dirItems, async (file: string, i: number) => {
-//     const fileName = file.replace(/\\/g, '/');
-//     issueOutput.appendLine(`file ${fileName}`);
-
-//     const rl = readline.createInterface({
-//       input: fs.createReadStream(fileName),
-//       crlfDelay: Infinity,
-//     });
-//     let replacementFile: string = '';
-//     let madeChange = false;
-//     let lineNumber = 0;
-//     // rl.on('line', async (line: string) => {
-//     // eslint-disable-next-line no-restricted-syntax
-//     for await (const line of rl) {
-//       lineNumber++;
-//       const containsTODO = line.toLowerCase().includes('todo:') || line.toLowerCase().includes('todo');
-//       let replacementLine = line;
-//       if (containsTODO) {
-//         madeChange = true;
-
-//         const title = line
-//           .replace('//', '')
-//           .replace('todo:', '')
-//           .replace('TODO:', '')
-//           .replace('todo', '')
-//           .replace('TODO', '');
-//         const description = `File: ${file} \n\n Line: ${lineNumber}`;
-//         const issue = JSON.parse(await createIssue(title, description));
-//         const issueNumber = issue.iid;
-
-//         replacementLine = line
-//           .replace('todo:', `ISSUE:#${issueNumber}:`)
-//           .replace('TODO:', `ISSUE:#${issueNumber}:`)
-//           .replace('todo', `ISSUE:#${issueNumber}:`)
-//           .replace('TODO', `ISSUE:#${issueNumber}:`);
-//         issueOutput.appendLine(replacementLine);
-//       }
-//       replacementFile += `${replacementLine}\n`;
-//     }
-//     // });
-
-//     // await once(rl, 'close');
-//     rl.close();
-//     if (madeChange) {
-//       fs.writeFileSync(fileName, replacementFile);
-//       issueOutput.appendLine(`${lineNumber} ${file}`);
-//       // write replacement file
-//     }
-//   });
-// };
 
 export class IssuesProvider implements vscode.TreeDataProvider<Issue> {
   // eslint-disable-next-line no-useless-constructor
-  private workspaceRoot;
+  private workspaceRoot:string;
   constructor(private _workspaceRoot: string) {
     this.workspaceRoot = _workspaceRoot;
     // issueOutput.appendLine(this.workspaceRoot);
@@ -185,14 +146,22 @@ export class IssuesProvider implements vscode.TreeDataProvider<Issue> {
         element.line,
         element.lineNumber,
         false,
-        gitlabLink
+        gitlabLink,
+        element.fileName
       );
       gitlabLinkItem.command = {
         command: "issues.openGitlabLink",
         title: "Select Node",
         arguments: [gitlabLinkItem]
-    };
-      return [gitlabLinkItem];
+      };
+      const vscodeDescription = `${element.fileName} - ${element.lineNumber}`;
+      const vscodeLinkItem = new Issue(`View in Editor`, vscodeDescription, vscode.TreeItemCollapsibleState.None, element.issueNumber, element.line, element.lineNumber, false, gitlabLink, element.fileName);
+      vscodeLinkItem.command = {
+          command: "issues.openEditorLink",
+          title: "Select Node",
+          arguments: [vscodeLinkItem]
+      };
+      return [gitlabLinkItem,vscodeLinkItem];
     }
     return getIssueItems(this.workspaceRoot);
   }

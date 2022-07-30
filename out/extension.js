@@ -1,20 +1,11 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deactivate = exports.activate = void 0;
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 const vscode_1 = require("vscode");
 const issues = require("./issues");
-const gitlabApi_1 = require("./gitlabApi");
+// import { createIssue, getIssues } from './gitlabApi';
 // import { convertTodoItems } from './issues';
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -26,6 +17,46 @@ function activate(context) {
         console.log(item.label);
         vscode_1.window.showInformationMessage((_a = item.gitLabLink) !== null && _a !== void 0 ? _a : '');
         vscode_1.env.openExternal(vscode_1.Uri.parse((_b = item.gitLabLink) !== null && _b !== void 0 ? _b : ''));
+        // const activeEditor = window.activeTextEditor;
+        // if(!activeEditor){
+        // 	window.showInformationMessage(`No active editor`);
+        // 	throw new Error('No active editor');
+        // }else { 
+        // 	window.showInformationMessage(`${item.fileName} ${item.lineNumber}`);
+        // }
+        // const definitions = commands.executeCommand<Location[]>(
+        // 	'editor.action.goToLocations',
+        // 	item.fileName, 
+        // 	item.lineNumber
+        // );
+    });
+    vscode_1.commands.registerCommand("issues.openEditorLink", (item) => {
+        var _a;
+        console.log(item.label);
+        // window.showInformationMessage( item.gitLabLink ?? '');
+        // env.openExternal(Uri.parse(item.gitLabLink ?? ''));
+        const activeEditor = vscode_1.window.activeTextEditor;
+        if (!activeEditor) {
+            vscode_1.window.showInformationMessage(`No active editor`);
+            throw new Error('No active editor');
+        }
+        else {
+            vscode_1.window.showInformationMessage(`${item.fileName} ${item.lineNumber} - TES4T253`);
+        }
+        // const definitions = commands.executeCommand<Location[]>(
+        // 	'editor.action.goToLocations',
+        // 	item.fileName, 
+        // 	item.lineNumber
+        // );
+        const uriString = `${vscode_1.workspace.rootPath}${(_a = item.fileName) === null || _a === void 0 ? void 0 : _a.replace('.', '')}`;
+        const uri = vscode_1.Uri.file(`${uriString}`);
+        vscode_1.window.showInformationMessage(`${uriString}`);
+        const definitions = vscode_1.commands.executeCommand('vscode.open', uri).then(() => {
+            const definitionsTwo = vscode_1.commands.executeCommand('revealLine', {
+                lineNumber: item.lineNumber,
+                at: 'center'
+            });
+        });
     });
     // Use the console to output diagnostic information (console.log) and errors (console.error)
     // This line of code will only be executed once when your extension is activated
@@ -33,45 +64,12 @@ function activate(context) {
     // The command has been defined in the package.json file
     // Now provide the implementation of the command with registerCommand
     // The commandId parameter must match the command field in package.json
-    const disposable = vscode_1.commands.registerCommand('issuetracker.helloWorld', () => {
+    const disposableHelloWorld = vscode_1.commands.registerCommand('issuetracker.helloWorld', () => {
         vscode_1.window.showInformationMessage('Hello World from issuetracker!');
     });
-    // const disposableTwo = commands.registerCommand('issuetracker.convertTodoItems', async () => {
-    // 	await convertTodoItems(workspace.rootPath || './');
-    // 	// Display a message box to the user
-    // 	window.showInformationMessage('converting todo items!');
-    // });
-    // Create output channel
-    const issueOutput = vscode_1.window.createOutputChannel('IssueTracker');
-    const disposableThree = vscode_1.commands.registerCommand('issuetracker.createIssue', () => __awaiter(this, void 0, void 0, function* () {
-        issueOutput.appendLine(`PAT ${process.env.PAT}`);
-        const data = yield gitlabApi_1.createIssue('test', 'test');
-        // Display a message box to the user
-        vscode_1.window.showInformationMessage('createIssue from issuetracker!');
-        vscode_1.window.showInformationMessage(`test ${data}}`);
-        // Write to output.
-        issueOutput.appendLine(`msg: ${data}`);
-    }));
-    const disposableFour = vscode_1.commands.registerCommand('issuetracker.getIssues', () => __awaiter(this, void 0, void 0, function* () {
-        const data = yield gitlabApi_1.getIssues();
-        const issueTitles = JSON.stringify(data.map((d) => ({
-            issue: d.title,
-            state: d.state,
-            description: d.description,
-            labels: d.labels,
-        })));
-        // Display a message box to the user
-        vscode_1.window.showInformationMessage('get issues from issuetracker!');
-        vscode_1.window.showInformationMessage(`test ${data}`);
-        // Write to output.
-        issueOutput.appendLine(issueTitles);
-    }));
-    const disposableFive = vscode_1.commands.registerCommand('issueTracker.refreshEntry', () => issueProvider.refresh());
-    context.subscriptions.push(disposable);
-    // context.subscriptions.push(disposableTwo);
-    context.subscriptions.push(disposableThree);
-    context.subscriptions.push(disposableFour);
-    context.subscriptions.push(disposableFive);
+    const disposableRefreshEntry = vscode_1.commands.registerCommand('issueTracker.refreshEntry', () => issueProvider.refresh());
+    context.subscriptions.push(disposableHelloWorld);
+    context.subscriptions.push(disposableRefreshEntry);
 }
 exports.activate = activate;
 // this method is called when your extension is deactivated

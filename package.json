@@ -18,11 +18,6 @@
     "configuration": {
       "title": "IssueTracker",
       "properties": {
-        "issueTracker.gitLabPersonalAccessToken": {
-          "type": "string",
-          "default": false,
-          "description": "Gitlab Personal Access Token"
-        },
         "issueTracker.gitLabProjectURL": {
           "type": "string",
           "default": false,
@@ -40,7 +35,7 @@
         {
           "id": "issue-explorer",
           "title": "Issue Explorer",
-          "icon": "./src/media/logo.png"
+          "icon": "./media/logo.png"
         }
       ]
     },
@@ -49,7 +44,7 @@
         {
           "id": "issues",
           "name": "issues",
-          "icon": "./src/media/logo.png",
+          "icon": "./media/logo.png",
           "contextualTitle": "Issues"
         }
       ]
@@ -75,7 +70,7 @@
       {
         "command": "issueTracker.refreshEntry",
         "title": "Refresh",
-        "icon": "./src/media/refresh.png"
+        "icon": "./media/refresh.png"
       }
     ]
   },
