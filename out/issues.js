@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.IssuesProvider = exports.flattenOnce = exports.Issue = void 0;
+exports.IssuesProvider = exports.Issue = void 0;
 /* eslint-disable no-empty-function */
 /* eslint-disable class-methods-use-this */
 // eslint-disable-next-line max-classes-per-file
@@ -43,28 +43,6 @@ class Issue extends vscode.TreeItem {
     }
 }
 exports.Issue = Issue;
-const flattenOnce = (usageOrCostArray) => (usageOrCostArray.reduce((acc, curr) => [...acc, ...curr], []));
-exports.flattenOnce = flattenOnce;
-// const getAllFiles = (dirPath: string, arrayOfFiles: string[]) => {
-//   const foldersToIgnore: string[] = settings.get('foldersToIgnore') ?? [];
-//   const files = fs.readdirSync(dirPath);
-//   const pathFromWorkspaceRoot = dirPath.replace(workspace.rootPath ?? '', '');
-//   let _arrayOfFiles = arrayOfFiles || [];
-//   files.forEach((file) => {
-//     if (fs.statSync(`${dirPath}/${file}`).isDirectory()) {
-//       issueOutput.appendLine(`.${pathFromWorkspaceRoot}/${file}`);
-//       _arrayOfFiles = (
-//         !foldersToIgnore.includes(`.${pathFromWorkspaceRoot}/${file}`)
-//           ? getAllFiles(`${dirPath}/${file}`, _arrayOfFiles)
-//           : _arrayOfFiles
-//       );
-//     } else if (file.includes('.ts')) {
-//       issueOutput.appendLine(`.${pathFromWorkspaceRoot}/${file}`);
-//       _arrayOfFiles.push(path.join(dirPath, '/', file));
-//     }
-//   });
-//   return arrayOfFiles;
-// };
 const getIssueItems = (workspaceRoot) => __awaiter(void 0, void 0, void 0, function* () {
     const dirItems = helpers_1.getAllFiles(workspaceRoot);
     issueOutput.appendLine(`GOT ALL FILES`);
@@ -97,13 +75,10 @@ const getIssueItems = (workspaceRoot) => __awaiter(void 0, void 0, void 0, funct
         rl.on('close', (error) => {
             issueOutput.appendLine(`FINISHED READING FILE ${localFileName}`);
         });
-        rl.on('pause', () => {
-            console.log('Readline paused.');
-        });
         yield events_1.once(rl, 'close');
         return issues;
     }));
-    return exports.flattenOnce(issueItems);
+    return utilities_1.flattenOnce(issueItems);
 });
 class IssuesProvider {
     constructor(_workspaceRoot) {

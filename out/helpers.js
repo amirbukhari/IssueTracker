@@ -16,9 +16,9 @@ const determineFileType = (file) => {
 const getAllFiles = (dirPath) => {
     var _a, _b;
     const foldersToIgnore = (_a = settings.get('foldersToIgnore')) !== null && _a !== void 0 ? _a : [];
-    const files = fs.readdirSync(dirPath);
+    const directory = fs.readdirSync(dirPath);
     const pathFromWorkspaceRoot = dirPath.replace((_b = vscode_1.workspace.rootPath) !== null && _b !== void 0 ? _b : '', '');
-    return files.reduce((acc, file) => {
+    return directory.reduce((acc, file) => {
         //Folder Logic
         const isFolder = fs.statSync(`${dirPath}/${file}`).isDirectory();
         const isFolderToIgnore = isFolder ? foldersToIgnore.includes(`.${pathFromWorkspaceRoot}/${file}`) : false;
